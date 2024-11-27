@@ -1,0 +1,1 @@
+Пример тг бота, которого мы реализуем на паре: https://github.com/voorhs/example-project/blob/tg-bot/bot.py
