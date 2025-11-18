@@ -53,6 +53,7 @@ if experiment_option == "start new":
         st.header("Upload Training Data")
         train_file = st.file_uploader("Upload your training CSV file", type=["csv"])
 
+        target_column = None
         if train_file is not None:
             train_data = load_data(train_file)
             target_column = st.sidebar.selectbox(
@@ -62,7 +63,12 @@ if experiment_option == "start new":
         submitted = st.button("Register Experiment")
 
         if submitted:
-            if train_file is not None:
+            # Re-validate the experiment name at submission time
+            if experiment_name in client.get_names():
+                st.error(f"Cannot register: Experiment '{experiment_name}' already exists!")
+            elif train_file is None:
+                st.warning("You didn't load training data yet")
+            else:
                 experiment_config = ExperimentConfig(
                     name=experiment_name,
                     ml_model=model_choice,
@@ -73,12 +79,8 @@ if experiment_option == "start new":
                 )
                 client.register_experiment(experiment_config, train_file)
                 st.sidebar.success(
-                    f"Experiment {experiment_config.name} was successfully created!"
+                    f"Experiment {experiment_config.name} was successfully created! Refresh the page to see it in the list of experiments"
                 )
-            else:
-                st.warning("You didn't load training data yet")
-                if experiment_name in client.get_names():
-                    st.warning("You need to change the experiment name above")
 
     st.stop()
 
